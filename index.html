@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+  <div style="position: fixed; top: 2%; right:2%;" id="ci">
+    <!-- this is the reason why the page keeps on reloading-->
+    <input id="un" value="me" onkeyup="setNaC()">
+    <input id="col" value="#59d988" type="color" onchange="setNaC()">
+    <input id="msg">
+    <button onclick="send()" id="send-btn">Send</button>
+  </div>
+
+  <div id="chat">
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+  <script src="script.js"></script>
+</html>
