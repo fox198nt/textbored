@@ -5,4 +5,4 @@ the third one
 
 
 ## credits
-js-cookie
+[js-cookie](https://github.com/js-cookie)

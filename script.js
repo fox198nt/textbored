@@ -36,7 +36,7 @@ function send(event) {
       const data = `<p class="msg"><strong class="unms" style="outline: 2px solid ${col}">${un}</strong> ${timeString(true)} <br><br> ${document.getElementById("msg").value}</p><br>`;
       connection.send(data);
       document.getElementById("msg").value = "";
-    } 
+    }
   }
 }
 function setNaC() {
@@ -52,10 +52,15 @@ ci.addEventListener("keypress", function(event) {
     document.getElementById("send-btn").click();
   }
 });
-
 window.onload = function() {
-  if (Cookies.get("un") == null) {} else {
+  /* if (Cookies.get("un") == null) {} else {
     col = Cookies.get("col")
     un = Cookies.get('un')
-  }
+  } */
+	un = "user" + Math.floor(Math.random() * 999);
+
+  var p1 = Math.floor(Math.random() * 255).toString();
+	var p2 = Math.floor(Math.random() * 255).toString();
+  var p3 = Math.floor(Math.random() * 255).toString();
+	col = `rgb(${p1}, ${p2}, ${p3})`;
 }
