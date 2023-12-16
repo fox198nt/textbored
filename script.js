@@ -3,6 +3,27 @@ var col = document.querySelector("#col").value;
 var un = document.querySelector("#un").value;
 var ci = document.querySelector("#ci")
 
+
+
+ci.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    document.getElementById("send-btn").click();
+  }
+});
+window.onload = function() {
+  /* if (Cookies.get("un") == null) {} else {
+    col = Cookies.get("col")
+    un = Cookies.get('un')
+  } */
+	un = "user" + Math.floor(Math.random() * 999);
+
+  var p1 = Math.floor(Math.random() * 255).toString();
+	var p2 = Math.floor(Math.random() * 255).toString();
+  var p3 = Math.floor(Math.random() * 255).toString();
+	col = `rgb(${p1}, ${p2}, ${p3})`;
+}
+
 connection.onopen = (event) => {
   connection.send(`<p><strong class="unms" style="outline: 2px solid ${col}">${un}</strong> has joined the chat.</p><br>`)
   console.log("Connection is open")
@@ -44,23 +65,4 @@ function setNaC() {
   un = document.querySelector("#un").value;
   Cookies.set('col', col)
   Cookies.set('un', un)
-}
-
-ci.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    document.getElementById("send-btn").click();
-  }
-});
-window.onload = function() {
-  /* if (Cookies.get("un") == null) {} else {
-    col = Cookies.get("col")
-    un = Cookies.get('un')
-  } */
-	un = "user" + Math.floor(Math.random() * 999);
-
-  var p1 = Math.floor(Math.random() * 255).toString();
-	var p2 = Math.floor(Math.random() * 255).toString();
-  var p3 = Math.floor(Math.random() * 255).toString();
-	col = `rgb(${p1}, ${p2}, ${p3})`;
 }
