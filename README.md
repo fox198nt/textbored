@@ -1,7 +1,8 @@
-# textbored
-the third one
+<img src="logo.svg" alt="Textbored Logo" height='90px'>  \
+first came chattingly fpmod, then keynet, and now this. \
+local hosting has revived this project!!!
 
-[open textbored](https://fox198nt.github.io/textbored/)
+currently uses html for messages rather than json, will change
 
 
 ## credits

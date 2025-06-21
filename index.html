@@ -2,19 +2,29 @@
 <html>
   <head>
     <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width">
-  </head><body>
-    <div style="position: fixed; top: 2%; right:2%;" id="ci">
-      <input id="un" value="me" onkeyup="setNaC()">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="logo-simple.svg">
+    <title>Textbored</title>
+  </head>
+  <body>
+    <img src="logo.svg" height="50px" id='logo'>
+    <button id="userstgs-btn"><i class="bi bi-list"></i></button>
+    <div id="userstgs">
+      <label for="un">Username:</label>
+      <input id="un" value="me" onblur="setNaC()">
+      
+      <label for="col">Color:</label>
       <input id="col" value="#59d988" type="color" onchange="setNaC()">
-      <input id="msg">
-      <button onclick="send()" id="send-btn">Send</button>
     </div>
 
-    <div id="chat">
+    <div id="chat"></div>
+    <div id="msgbox">
+      <input id="msg">
+      <button onclick="send()" id="send-btn"><i class="bi bi-send"></i></button>
     </div>
   
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>
