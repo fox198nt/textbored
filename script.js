@@ -1,10 +1,10 @@
-/* textbored beta 0.2 */
+/* textbored beta 0.3 */
 // variables
-// const connection = new WebSocket(`ws://${prompt('Enter the URL of the websocket')}`); // if other ws is required
-const connection = new WebSocket(`wss://textbored-websocket.onrender.com`); // render websocket
+const connection = new WebSocket("wss://textbored-websocket.onrender.com");
 const ci = document.querySelector("#userstgs");
 let col = document.querySelector("#col").value;
 let un = document.querySelector("#un").value;
+const chatElement = document.getElementById("chat");
 let usToggle = false;
 
 // json to html parser
@@ -14,19 +14,36 @@ function J2HParse(jsonString) {
     const trimmedJsonString = jsonString.trim();
     pd = JSON.parse(trimmedJsonString);
   } catch (e) {
-    console.error("Error parsing JSON in J2HParse:", e);
+    console.error("Error parsing JSON in J2HParse:", e, "Original string:", jsonString);
     return `<p style="color: red;">Error processing message</p>`;
   }
 
-  if (pd.type == 'message') {
-    const messageText = pd.message || ''; // Use empty string if pd.message is missing
-    return `<p class="msg"><strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong> ${pd.timestamp} <br><br> ${messageText}</p><br>`;
-  } else if (pd.type == 'join') {
-    return `<p><strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong> has joined the chat.</p><br>`;
+  let resultHtml = '';
+
+  switch (pd.type) {
+    case 'message':
+      const messageText = pd.message || '';
+      resultHtml = `<p class="msg"><strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong> ${pd.timestamp} <br><br> ${messageText}</p><br>`;
+      break;
+    case 'join':
+      // MODIFIED: Removed the check for own user to show own join message
+      resultHtml = `<p><strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong> has joined the chat.</p><br>`;
+      break;
+    case 'leave':
+      resultHtml = `<p><strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong> has left the chat.</p><br>`;
+      break;
+    case 'change':
+      resultHtml = `<p><strong class="unms" style="outline: 4px solid ${pd.oldCol}">${pd.oldUn}</strong> is now <strong class="unms" style="outline: 4px solid ${pd.color}">${pd.username}</strong>.</p><br>`;
+      break;
+    case 'error':
+      resultHtml = `<p style="color: red;">Server Error: ${pd.message}</p><br>`;
+      break;
+    default:
+      console.warn("J2HParse received unknown message type:", pd.type, pd);
+      resultHtml = '';
+      break;
   }
-  // Return an empty string if type is not recognized
-  console.warn("J2HParse received unknown message type:", pd.type, pd);
-  return ''; // Default return to prevent undefined
+  return resultHtml;
 }
 
 // generate time string
@@ -46,8 +63,11 @@ function timeString(t = false) {
 
 // set name and color of user
 function setNaC() {
-  let oldUser = `<strong class="unms" style="outline: 4px solid ${col}">${un}</strong>`;
+  let oldUserUn = un;
+  let oldUserCol = col;
+
   if (document.querySelector("#un").value === "") {
+    // Reverted to standard alert since modal was undesired
     alert("You can't have no username!");
     return;
   } else {
@@ -55,7 +75,15 @@ function setNaC() {
     un = document.querySelector("#un").value;
     Cookies.set('col', col);
     Cookies.set('un', un);
-    let changeMsg = `<p>${oldUser} is now <strong class="unms" style="outline: 4px solid ${col}">${un}</strong>.</p><br>`
+    let changeMsg = JSON.stringify({
+    type: "change",
+    client: "textbored",
+    oldUn: oldUserUn,
+    oldCol: oldUserCol,
+    username: un,
+    color: col,
+    timestamp: timeString(true)
+});
     connection.send(changeMsg);
   };
 };
@@ -66,48 +94,67 @@ window.onload = function() {
     un = Cookies.get("un");
     col = Cookies.get("col");
   } else {
-    un = "user" + Math.floor(Math.random() * 999);
-    const p1 = Math.floor(Math.random() * 255).toString();
-    const p2 = Math.floor(Math.random() * 255).toString();
-    const p3 = Math.floor(Math.random() * 255).toString();
-    col = `rgb(${p1}, ${p2}, ${p3})`;
+    un = "user" + Math.floor(Math.random() * 9999);
+    col = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
   }
   document.querySelector("#un").value = un;
   document.querySelector("#col").value = col;
 };
 
+
 // send connection message
 connection.onopen = (event) => {
-  connection.send(`{
-    "type": "join",
-    "client": "textbored",
-    "username": "${un}",
-    "color": "${col}",
-    "timestamp": "${timeString(true)}"
-}`);
-  console.log("Connection is open");
+  if (!un || !col) {
+    un = Cookies.get("un") || "user" + Math.floor(Math.random() * 999);
+    col = Cookies.get("col") || `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
+    document.querySelector("#un").value = un;
+    document.querySelector("#col").value = col;
+  }
+
+  connection.send(JSON.stringify({
+    type: "join",
+    client: "textbored",
+    username: un,
+    color: col,
+    timestamp: timeString(true)
+  }));
+  console.log("Connection is open, sent join message.");
+  chatElement.innerHTML += "<h3>Connection Esablished</h3>"
 };
 
 // messages handler
 connection.onmessage = (event) => {
-    if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = function() {
-            document.getElementById("chat").innerHTML += reader.result;
-        };
-        reader.readAsText(event.data);
-    } else if (typeof event.data === 'string') {
-        let htmlContent = J2HParse(event.data); // J2HParse returns the HTML string directly
+  // Check if the user is currently scrolled to the bottom (or very near it)
+  const isScrolledToBottom = chatElement.scrollHeight - chatElement.clientHeight <= chatElement.scrollTop + 1;
 
-        // If J2HParse successfully generated HTML, append it
-        if (htmlContent) { // This checks if the string is not empty or null/undefined (which J2HParse should prevent now)
-            document.getElementById("chat").innerHTML += htmlContent;
-        } else {
-            console.warn("J2HParse returned an empty string, nothing to append.");
+  if (event.data instanceof Blob) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      let htmlContent = J2HParse(reader.result);
+      if (htmlContent) {
+        chatElement.innerHTML += htmlContent;
+        if (isScrolledToBottom) {
+          chatElement.scrollTop = chatElement.scrollHeight;
         }
+      } else {
+          console.warn("J2HParse returned an empty string from Blob data, nothing to append.");
+      }
+    };
+    reader.readAsText(event.data);
+  } else if (typeof event.data === 'string') {
+    let htmlContent = J2HParse(event.data);
+
+    if (htmlContent) {
+      chatElement.innerHTML += htmlContent;
+      if (isScrolledToBottom) {
+        chatElement.scrollTop = chatElement.scrollHeight;
+      }
     } else {
-        console.warn("Received unexpected data type from WebSocket:", typeof event.data, event.data);
+      console.warn("J2HParse returned an empty string, nothing to append.");
     }
+  } else {
+    console.warn("Received unexpected data type from WebSocket:", typeof event.data, event.data);
+  }
 };
 
 // well, errors
@@ -118,6 +165,7 @@ connection.onerror = (event) => {
 // connection close handler
 connection.onclose = (event) => {
   console.error("Connection closed... code:", event.code, "reason:", event.reason);
+  // Reverted to standard alert
   alert("Connection closed... code: " + event.code + ", reason: " + event.reason);
 };
 
@@ -125,20 +173,21 @@ connection.onclose = (event) => {
 function send() {
   if (connection.readyState === WebSocket.OPEN) {
     const message = document.getElementById("msg").value;
-    const msgTemp = `{
-    "type": "message",
-    "client": "textbored",
-    "username": "${un}",
-    "color": "${col}",
-    "message": "${message}",
-    "timestamp": "${timeString(true)}"
-}`
-    if (message !== "") {
-      const data = msgTemp
-			connection.send(data);
+    const msgTemp = {
+      type: "message",
+      client: "textbored",
+      username: un,
+      color: col,
+      message: message,
+      timestamp: timeString(true)
+    };
+    if (message.trim() !== "") {
+      connection.send(JSON.stringify(msgTemp));
       document.getElementById("msg").value = "";
     };
-  };
+  } else {
+    alert("Connection Error", "Cannot send message, connection is not open."); // Reverted to standard alert
+  }
 };
 
 // user settings pop-up toggle
@@ -151,6 +200,13 @@ document.querySelector('#userstgs-btn').addEventListener('click', function() {
     usToggle = false;
   };
 });
+// close menu on click out of the menu
+document.addEventListener('click', function(event) {
+  if (!ci.contains(event.target) && !document.querySelector('#userstgs-btn').contains(event.target) && usToggle) {
+    ci.style.display = "none";
+    usToggle = false;
+  }
+});
 
 // send message on enter key press
 document.addEventListener("keypress", function(event) {
@@ -159,5 +215,3 @@ document.addEventListener("keypress", function(event) {
     send();
   }
 });
-
-// a lot is done by gemini
