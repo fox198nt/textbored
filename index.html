@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<!-- SO SIMPLE HTML WOW -->
 <html>
   <head>
     <meta charset="utf-8">
@@ -8,8 +9,18 @@
     <title>Textbored</title>
   </head>
   <body>
+    <div id="customModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+      <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: none; width: fit-content; max-width: 400px; border-radius: 15px; text-align: center; color: #000;">
+        <h3 id="modalTitle"></h3>
+        <div id="modalMessage"></div>
+        <button id="modalCloseBtn" onclick='hideModal()' style="background-color:#15eac7; color: white; padding: 15px; border: none; border-radius: 20px; cursor: pointer;">OK</button>
+      </div>
+    </div>
     <img src="logo.svg" height="50px" id='logo'>
-    <button id="userstgs-btn"><i class="bi bi-list"></i></button>
+    <div id="btns">
+      <button id="userstgs-btn"><i class="bi bi-list"></i></button>
+      <button id="usrlist-btn" style="top: 7.5vh;"><i class="bi bi-people"></i></button>
+    </div>
     <div id="userstgs">
       <label for="un">Username:</label>
       <input id="un" value="me" onblur="setNaC()">
@@ -23,7 +34,8 @@
       <input id="msg">
       <button onclick="send()" id="send-btn"><i class="bi bi-send"></i></button>
     </div>
-  
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <script src="script.js"></script>
   </body>

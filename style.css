@@ -21,11 +21,13 @@ input {
 button:hover {
     background-color: dimgrey !important;
     color: white !important;
+    transition: ease 0.5s;
+    cursor: pointer;
 }
 
 #chat {
-    width: 100%;
-    max-width: 100vw;
+    width: 99%;
+    max-width: 99vw;
     height: 80vh;
     display: flex;
     flex-direction: column;
@@ -35,6 +37,7 @@ button:hover {
     position: absolute;
     font-size: 1.25rem;
     top: 10vh;
+    left: 1vw;
 }
 
 #msgbox {
@@ -96,7 +99,7 @@ button:hover {
     z-index: 10;
 }
 
-#userstgs-btn {
+#userstgs-btn, #usrlist-btn {
     position: fixed;
     top: 0;
     right: 0;
@@ -130,6 +133,7 @@ input[type="color"] {
     padding: 5px;
     border-radius: 10px;
     margin-right: 5px;
+    margin-left: 5px;
     display: inline-block;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -180,7 +184,7 @@ input[type="color"] {
         width: 2.5rem;
         font-size: 1.2rem;
     }
-    #userstgs-btn {
+    #userstgs-btn, #usrlist-btn {
         font-size: 1rem;
         padding: 8px;
         margin: 5px;
