@@ -3,6 +3,5 @@ first came chattingly fpmod, then keynet, and now this. \
 [launch textbored!](https://fox198nt.github.io/textbored)
 
 ## credits
-[js-cookie](github.com/js-cookie)
+[js-cookie](https://github.com/js-cookie)
 [render](render.com)
-[sanitize-html](github.com/apostrophecms/sanitize-html)
