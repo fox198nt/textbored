@@ -109,8 +109,9 @@ function setNaC() {
     oldCol: oldUserCol,
     username: un,
     color: col,
-    timestamp: timeString(true)
-});
+    timestamp: ts
+    });
+    console.log("Changed username and color")
     connection.send(changeMsg);
   };
 };
