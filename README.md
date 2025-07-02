@@ -4,4 +4,5 @@ first came chattingly fpmod, then keynet, and now this. \
 
 ## credits
 [js-cookie](https://github.com/js-cookie)
-[render](render.com)
+[render](https://render.com)
+[sanitize-html](https://github.com/apostrophecms/sanitize-html)
